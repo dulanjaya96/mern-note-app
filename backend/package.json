@@ -8,6 +8,7 @@
     "lucide-react": "^0.525.0",
     "mongoos": "^0.0.1-security",
     "mongoose": "^8.16.3",
+    "note_app": "file:..",
     "react-router": "^7.6.3"
   },
   "name": "backend",
