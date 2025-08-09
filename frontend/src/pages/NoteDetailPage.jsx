@@ -8,7 +8,7 @@ import { Link } from 'react-router'
 import { ArrowLeftIcon, Trash2Icon } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-const NoteDetailPage = () => {
+const NoteDetailPage = ({ user }) => {
   const [note, setNote] = useState(null)
   const [loading, setLoading] = useState(true)
   const[saving, setSaving] = useState(false)
@@ -16,6 +16,42 @@ const NoteDetailPage = () => {
   const navigate = useNavigate()
 
   const {id} = useParams()
+
+  if (user === undefined) {
+      return (
+        <div className='min-h-screen bg-base-200 flex items-center justify-center'>
+          <LoaderIcon className="animate-spin size-10"/>
+        </div>
+      );
+    }
+
+  // Show login prompt if user is not authenticated
+  if (user === null) {
+    return (
+      <div className='min-h-screen bg-base-200'>
+        <div className='container mx-auto px-4 py-8'>
+          <div className='max-w-2xl mx-auto'>
+            
+            
+            <div className='card bg-base-100'>
+              <div className='card-body text-center'>
+                <h2 className='card-title text-2xl mb-4 justify-center'>Authentication Required</h2>
+                <p className='mb-6'>You need to be logged in to view this note.</p>
+                <div className='card-actions justify-center gap-4'>
+                  <Link to="/login" className="btn btn-primary">
+                    Log In
+                  </Link>
+                  <Link to="/signup" className="btn btn-outline">
+                    Sign Up
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     const fetchNote = async () => {

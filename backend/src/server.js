@@ -4,6 +4,7 @@ import cors from 'cors';
 import path from 'path';
 
 import notesRoutes from './routes/notesRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 import {connectDB} from './config/db.js';
 import rateLimiter from './middleware/rateLimiter.js';
 dotenv.config();
@@ -29,6 +30,8 @@ app.use(express.json()); // Middleware to parse JSON bodies
 // app.use(rateLimiter);
 
 app.use("/api/notes", notesRoutes);
+app.use('/api/users', userRoutes);
+
 
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname,"../frontend/dist"))); // Serve static files from the frontend build directory

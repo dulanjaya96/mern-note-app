@@ -1,8 +1,9 @@
 import Note from "../models/Note.js";
 
-export async function getAllNotes(req, res) {
+// Get all notes for the authenticated user
+export const getAllNotes = async (req, res) => {
   try {
-    const notes = await Note.find().sort({createdAt: -1}); // Sort by createdAt in descending order
+    const notes = await Note.find({ user: req.user._id }).sort({ createdAt: -1 }); // Sort by createdAt in descending order
     res.status(200).json(notes);
   } catch (error) {
     console.error("Error in getAllNotes controller", error);
@@ -11,9 +12,10 @@ export async function getAllNotes(req, res) {
   }
 };
 
-export async function getNoteById(req, res) {
+// Get a specific note (only if it belongs to the user)
+export const getNoteById = async (req, res) => {
   try {
-    const note = await Note.findById(req.params.id);
+    const note = await Note.findOne({ _id: req.params.id, user: req.user._id });
     if (!note) return res.status(404).json({message: "Note not found"});
     res.json(note); 
     
@@ -24,12 +26,16 @@ export async function getNoteById(req, res) {
   }
 };
 
-export async function createNote(req, res) {
+// Create a new note for the authenticated user
+export const createNote = async (req, res) => {
   try {
     const {title, content} = req.body;
-    const note = new Note({title, content});
-    const savedNote = await note.save();
-    res.status(201).json({savedNote});
+    const note = await Note.create({
+      title,
+      content,
+      user: req.user._id,
+    });
+    res.status(201).json(note);
   } catch (error) {
     console.error("Error in createNote controller", error);
     res.status(500).json({message: "Internal server error"});
@@ -37,13 +43,20 @@ export async function createNote(req, res) {
   }
 };
 
-export async function updateNote(req, res) {
+// Update a note (only if it belongs to the user)
+export const updateNote = async (req, res) => {
   try {
     const {title, content} = req.body;
-    const updatedNote = await Note.findByIdAndUpdate(req.params.id, {title, content}, {new: true});
-    if (!updatedNote) return res.status(404).json({message: "Note not found"});
+    const note = await Note.findOneAndUpdate(
+      { _id: req.params.id, user: req.user._id },
+      { title, content },
+      { new: true, runValidators: true }
+    );
+    if (!note) {
+      return res.status(404).json({ message: 'Note not found' });
+    }
     
-    res.status(200).json(updatedNote);
+    res.status(200).json(note);
   } catch (error) {
     console.error("Error in updateNote controller", error);
     res.status(500).json({message: "Internal server error"});
@@ -51,10 +64,13 @@ export async function updateNote(req, res) {
   }
 };
 
-export async function deleteNote(req, res) {
+// Delete a note (only if it belongs to the user)
+export const deleteNote = async (req, res) => {
   try {
-    const deletedNote = await Note.findByIdAndDelete(req.params.id);
-    if (!deletedNote) return res.status(404).json({message: "Note not found"});
+    const note = await Note.findOneAndDelete({ _id: req.params.id, user: req.user._id });
+    if (!note) {
+      return res.status(404).json({ message: 'Note not found' });
+    }
     
     res.status(200).json({message: "delete successfully"});
   } catch (error) {

@@ -2,7 +2,13 @@ import React from 'react'
 import { Link } from 'react-router'
 import { PlusIcon } from 'lucide-react'
 
-const Navbar = ({ toggleTheme }) => {
+const Navbar = ({ user, setUser, toggleTheme }) => {
+
+  const handleLogout = () => {
+    localStorage.removeItem('userToken'); // Remove token
+    setUser(null); // Clear user state
+  };
+
   return (
     <header className="bg-base-300 border-b border-base-content/10">
       <div className="mx-auto max-w-6xl p-4">
@@ -15,6 +21,23 @@ const Navbar = ({ toggleTheme }) => {
               <PlusIcon className="size-5" />
               <span>Create Note</span>
             </Link>
+            {user ? (
+              <>
+                <span>Welcome, {user.name}</span>
+                <button onClick={handleLogout} className="btn btn-secondary">
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="btn btn-primary">
+                  Login
+                </Link>
+                <Link to="/signup" className="btn btn-secondary">
+                  Signup
+                </Link>
+              </>
+            )}
 
             {/* Theme Toggle Button */}
             <button
