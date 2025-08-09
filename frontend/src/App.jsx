@@ -10,13 +10,24 @@ import api from './lib/axios.js';
 import toast from 'react-hot-toast'
 
 const App = () => {
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme || 'light';
+  });
+
   const [user, setUser] = useState(null);
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light'
-    setTheme(newTheme)    
+    setTheme(newTheme)
+    // Save theme to localStorage for persistence
+    localStorage.setItem('theme', newTheme)
   }
+
+  // Apply theme on mount and when theme changes
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
 
   useEffect(() => {
     const token = localStorage.getItem('userToken');
@@ -41,7 +52,7 @@ const App = () => {
       <Routes>
         <Route
           path="/"
-          element={<HomePage toggleTheme={toggleTheme} user={user} setUser={setUser} />}
+          element={<HomePage toggleTheme={toggleTheme} theme={theme} user={user} setUser={setUser} />}
         />
         <Route path="/create" element={<CreatePage user={user} />} />
         <Route path="/note/:id" element={<NoteDetailPage user={user} />} />
